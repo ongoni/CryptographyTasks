@@ -1,0 +1,5 @@
+C:\Users\ongoni\RiderProjects\CryptographyTasks\CryptographyTasks\obj\Debug\CryptographyTasks.csprojResolveAssemblyReference.cache
+C:\Users\ongoni\RiderProjects\CryptographyTasks\CryptographyTasks\bin\Debug\CryptographyTasks.exe
+C:\Users\ongoni\RiderProjects\CryptographyTasks\CryptographyTasks\bin\Debug\CryptographyTasks.pdb
+C:\Users\ongoni\RiderProjects\CryptographyTasks\CryptographyTasks\obj\Debug\CryptographyTasks.exe
+C:\Users\ongoni\RiderProjects\CryptographyTasks\CryptographyTasks\obj\Debug\CryptographyTasks.pdb
