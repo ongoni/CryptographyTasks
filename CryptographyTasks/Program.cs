@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using System.Net.Mime;
 using System.Security.Cryptography;
 
 namespace CryptographyTasks {
@@ -15,7 +14,11 @@ namespace CryptographyTasks {
         };
         
         //первое задание - вычисление контрольной суммы файла
-        public static string GetFileControlSum(string path) {
+        public static void Task1() {
+            Console.WriteLine("File contol sum - " + GetFileMd5("../../lorem ipsum.txt") + '\n');
+        }
+        
+        public static string GetFileMd5(string path) {
             MD5 md5 = MD5.Create(); //создаём экземпляр класса md5
             StringBuilder result = new StringBuilder(); //сюда будем записывать результат
             FileStream fileStream = File.OpenRead(path); //создаём битовый файловый поток на основе файла
@@ -29,6 +32,14 @@ namespace CryptographyTasks {
         }
 
         //второе задание, часть 1 - шифр "атбаш"
+        public static void Task2_1() {
+            string atbashEncoded = GetAtbashCode(File.ReadAllText("../../lorem ipsum.txt"));
+            string atbashDecoded = GetAtbashCode(atbashEncoded);
+            Console.WriteLine("Atbash code:");
+            Console.WriteLine("1. encoded - " + atbashEncoded);
+            Console.WriteLine("2. decoded - " + atbashDecoded + '\n');
+        }
+        
         //шифрование/дешифрование производится одной фукнцией
         public static string GetAtbashCode(string text) {   
             StringBuilder result = new StringBuilder(); //сюда будем записывать результат
@@ -48,10 +59,18 @@ namespace CryptographyTasks {
         }
 
         //второе задание, часть 2 - шифр Цезаря
+        public static void Task2_2() {
+            string caesarEncoded = CaesarCipherEncode(File.ReadAllText("../../lorem ipsum.txt"));
+            string caesarDecoded = CaesarCipherDecode(caesarEncoded);
+            Console.WriteLine("Caesar code:");
+            Console.WriteLine("1. encoded - " + caesarEncoded);
+            Console.WriteLine("2. decoded - " + caesarDecoded + '\n');
+        }
+        
         //шифрование
         //индекс замены вычисляется как остаток от деления на длину алфавита, т.е. если исходная буква - 'z'
         //являющаяся 26-ой в алфавите, то её замена будет на позиции (26 + 3) % 26 = 3 - т.е. её замена - буква 'c'
-        public static string CaesarEncode(string text) {
+        public static string CaesarCipherEncode(string text) {
             StringBuilder result = new StringBuilder();
 
             for (int i = 0; i < text.Length; i++) { //для каждого символа из текста
@@ -72,7 +91,7 @@ namespace CryptographyTasks {
         //дешифрование
         //пусть нужно дешифровать букву 'a', которая ялвяется первой в алфавите, тогда 
         //её замена будет на позиции (26 + 1 - 3) % 26 = 24 - т.е её замена - бувка 'x'
-        public static string CaesarDecode(string encodedText) {
+        public static string CaesarCipherDecode(string encodedText) {
             StringBuilder result = new StringBuilder();
 
             for (int i = 0; i < encodedText.Length; i++) { //для каждого символа из текста
@@ -90,27 +109,56 @@ namespace CryptographyTasks {
             return result.ToString(); //возвращаем результат, приведённый к типу string
         }
         
+        //третье задание - маршрутное шифрование
+        public static void Task3() {
+            int n, m;
+            string key;
+            while (true) {
+                Console.Write("Enter n: ");
+                n = int.Parse(Console.ReadLine());
+                Console.Write("Enter m: ");
+                m = int.Parse(Console.ReadLine());
+
+                if (n == m || n * m <= 0) {
+                    Console.WriteLine("Wrong data, try again.");
+                    continue;
+                }
+                
+                Console.Write("Enter key word (" + m + " symbols): ");
+                key = Console.ReadLine();
+
+                if (key.Length != m) {
+                    Console.Write("Key word must have " + m + "symbols.");
+                    continue;
+                }
+                break;
+            }
+            
+            
+        }
+        
+//        //шифрование
+//        public static string RouteCipherEncode() {
+//            
+//        }
+        
+//        //дешифрование        
+//        public static string RouteCipherDecode() {
+//            
+//        }
+
         public static void Main(string[] args) {
             //#1
-            Console.WriteLine("File contol sum - " + GetFileControlSum("../../input.txt") + '\n');
-            
-            //#2
-            string text = File.ReadAllText("../../input.txt");
-            string atbashEncoded = GetAtbashCode(text);
-            string atbashDecoded = GetAtbashCode(atbashEncoded);
-            Console.WriteLine("Atbash code:");
-            Console.WriteLine("1. encoded - " + atbashEncoded);
-            Console.WriteLine("2. decoded - " + atbashDecoded + '\n');
-            
+            Task1();
+            //#2.1
+            Task2_1();
+            //#2.2
+            Task2_2();
             //#3
-            string caesarEncoded = CaesarEncode(text);
-            string caesarDecoded = CaesarDecode(caesarEncoded);
-            Console.WriteLine("Caesar code:");
-            Console.WriteLine("1. encoded - " + caesarEncoded);
-            Console.WriteLine("2. decoded - " + caesarDecoded + '\n');
-            
+            Task3();
             //#4
             
+            //#5
         }
 
     }
