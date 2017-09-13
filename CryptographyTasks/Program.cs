@@ -1,4 +1,9 @@
-﻿using System;
+﻿//StringBuilder используется для оптимизации, т.к. в C# при изменении объекта типа stirng создаётся его копия, например:
+//string hello = "привет";
+//hello = hello + '!';
+//в результате выполнения кода в памяти останется строка "привет" и создастся новая строка "привет!"
+//а т.к. в коде часто происходит добавление по 1 символу к строке, то гораздо лучше использовать StringBuilder
+using System;
 using System.Collections;
 using System.IO;
 using System.Text;
@@ -17,7 +22,7 @@ namespace CryptographyTasks {
         
         //первое задание - вычисление контрольной суммы файла
         public static void Task1() {
-            Console.WriteLine("File contol sum - " + GetFileMd5("../../lorem ipsum.txt") + '\n');
+            Console.WriteLine("File contol sum - " + GetFileMd5("../../lorem ipsum.txt") + '\n'); //вывод контрольной суммы
         }
         
         private static string GetFileMd5(string path) {
@@ -38,8 +43,8 @@ namespace CryptographyTasks {
             string atbashEncoded = GetAtbashCode(File.ReadAllText("../../lorem ipsum.txt"));
             string atbashDecoded = GetAtbashCode(atbashEncoded);
             Console.WriteLine("Atbash cipher code:");
-            Console.WriteLine("1. encoded - " + atbashEncoded);
-            Console.WriteLine("2. decoded - " + atbashDecoded + '\n');
+            Console.WriteLine("1. encoded - " + atbashEncoded); //вывод закодированных данных
+            Console.WriteLine("2. decoded - " + atbashDecoded + '\n'); //вывод декодированных данных
         }
         
         //шифрование/дешифрование производится одной фукнцией
@@ -65,8 +70,8 @@ namespace CryptographyTasks {
             string caesarEncoded = CaesarCipherEncode(File.ReadAllText("../../lorem ipsum.txt"));
             string caesarDecoded = CaesarCipherDecode(caesarEncoded);
             Console.WriteLine("Caesar cipher code:");
-            Console.WriteLine("1. encoded - " + caesarEncoded);
-            Console.WriteLine("2. decoded - " + caesarDecoded + '\n');
+            Console.WriteLine("1. encoded - " + caesarEncoded); //вывод закодированных данных
+            Console.WriteLine("2. decoded - " + caesarDecoded + '\n'); //вывод декодированных данных
         }
         
         //шифрование
@@ -115,47 +120,50 @@ namespace CryptographyTasks {
         public static void Task3() {
             int n, m;
             string key;
-            while (true) {
+            while (true) { //требуем ввести данные, пока они не будут корректны
                 Console.Write("Enter n: ");
-                n = int.Parse(Console.ReadLine());
+                n = int.Parse(Console.ReadLine()); 
                 Console.Write("Enter m: ");
                 m = int.Parse(Console.ReadLine());
 
-                if (n == m || n * m <= 0) {
+                if (n == m || n * m <= 0) { //n и m не должны быть равны и должны быть больше единицы
                     Console.WriteLine("Wrong data, try again.");
-                    continue;
+                    continue; //возвращаемся к вводу n и m
                 }
                 
-                Console.Write("Enter key word (" + m + " symbols): ");
+                Console.Write("Enter key word (" + m + " symbols): "); 
                 key = Console.ReadLine();
 
-                if (key.Length != m) {
+                if (key.Length != m) { //ключ должен быть длины m
                     Console.Write("Key word must have " + m + "symbols.");
                     continue;
                 }
-                break;
+                break; //если всё корректно введено, то здесь цикл прервётся
             }
 
+            //удаляем лишние символы и вызываем функцию шифрования
             string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText("../../lorem ipsum.txt")), n, m, key);
             //string routeDecoded = RouteCipherDecode(routeEncoded);
             Console.WriteLine("Route cipher code:");
             Console.WriteLine("1. encoded - " + routeEncoded);
             //Console.WriteLine("2. decoded - " + routeDecoded + '\n');
         }
-
+        
+        //добавление символов в конец
         private static string AppendSymbols(string row, int length) {
-            StringBuilder result = new StringBuilder(row);
-            while (result.Length != length) {
+            StringBuilder result = new StringBuilder(row); //здесь будет результат
+            while (result.Length != length) { //добавляем в конец символ 'x', пока длина блока не достигнет нужной длины
                 result.Append('x');
             }
 
-            return result.ToString();
+            return result.ToString(); //возвращаем результат
         }
 
+        //удаление всех символов кроме букв
         private static string RemoveSymbols(string text) {
-            StringBuilder result = new StringBuilder(text);
-            for (int i = 0; i < result.Length; i++) {
-                if (!Char.IsLetter(result[i]) || result[i] == ' ') {
+            StringBuilder result = new StringBuilder(text); //здесь будет результат
+            for (int i = 0; i < result.Length; i++) { //пока не прошли все символы
+                if (!Char.IsLetter(result[i])) { //если символ не является буквой, то удаляем его и уменьшаем i
                     result.Remove(i, 1);
                     i--;
                 }
@@ -164,11 +172,15 @@ namespace CryptographyTasks {
             return result.ToString();
         }
 
+        //выясняем порядок вывода столбцов
         private static ArrayList GetShowOrder(string key) {
-            ArrayList result = new ArrayList();
-            string sorted = String.Concat(key.OrderBy(c => c));
+            ArrayList result = new ArrayList(); //здесь будет результат
+            string sorted = String.Concat(key.OrderBy(x => x)); //сортируем буквы ключа в алфавитном порядке
 
-            for (int i = 0; i < key.Length; i++) {
+            for (int i = 0; i < key.Length; i++) { //добавляем индексы столбцов в массив в нужном порядке
+                //ищем позицию элемента из отсортированных букв ключа в самом ключе
+                //пусть ключ 'qwert', отсортированные буквы ключа - 'eqrtw'
+                //'e' находится на 3 позиции в ключе => первым выводим третий столбец и т.д.
                 result.Add(key.IndexOf(sorted[i]));
             }
             
@@ -177,38 +189,42 @@ namespace CryptographyTasks {
         
         //шифрование
         public static string RouteCipherEncode(string text, int n, int m, string key) {     
-            ArrayList entries = new ArrayList();
+            ArrayList entries = new ArrayList(); //здесь будут храниться блоки из n * m символов
             
-            while (text.Length != 0) {
-                if (text.Length < n * m) {
+            while (text.Length != 0) { //делим входной текст на блоки
+                if (text.Length < n * m) { //если длина оставшегося текст меньше нужной длины n * m, тогда добавляем в конец символы
                     entries.Add(AppendSymbols(text, n * m));
-                    break;
+                    break; //и выходим из цикла, т.к. получено максимум возможных блоков
                 }
-                entries.Add(text.Substring(0, n * m));
-                text = text.Remove(0, n * m);
+                entries.Add(text.Substring(0, n * m)); //иначе добавляем блок в массив
+                text = text.Remove(0, n * m); //и удаляем добавленные данные из строки
             }
 
-            ArrayList order = GetShowOrder(key);
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < entries.Count; i++) {
-                char[,] matrix = new char[n + 1, m];
-                entries[i] += key;
+            ArrayList order = GetShowOrder(key); //получаем нужный порядок вывода столбцов
+            StringBuilder result = new StringBuilder(); //здесь будет результат шифрования
+            for (int i = 0; i < entries.Count; i++) { //для каждого блока
+                char[,] matrix = new char[n + 1, m]; //создаём новую матрицу
+                entries[i] += key; //добавляем в конец блока ключ
 
                 for (int j = 0; j < n + 1; j++) {
                     for (int k = 0; k < m; k++) {
-                        int index = j + j * n + k;
-                        matrix[j, k] = ((string) entries[i])[index];
+                        //заполняем матрицу символами из текущего блока
+                        //j - индекс строки, k - индекс столбца. пусть n = 4, тогда
+                        //при j = 0 index = j + j * n + k принимает значения от 0 до 4 включительно
+                        //при j = 1 - от 5 до 9 и т.д.
+                        //таким образом index пройдёт все значения от 0 до m^2 невключительно, т.е. весь блок будет просмотрен
+                        matrix[j, k] = ((string) entries[i])[j + j * n + k];
                     }
                 }
 
-                foreach (int index in order) {
-                    for (int j = 0; j < n; j++) {
+                foreach (int index in order) { //добавляем содержимое столбцов в результат
+                    for (int j = 0; j < n; j++) { //index - индекс столбца, j - индекс строки
                         result.Append(matrix[j, index]);
                     }
                 }
             }
 
-            return result.ToString();
+            return result.ToString(); //возвращаем результат
         }
         
 //        //дешифрование        
