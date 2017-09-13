@@ -143,10 +143,10 @@ namespace CryptographyTasks {
 
             //удаляем лишние символы и вызываем функцию шифрования
             string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText("../../lorem ipsum.txt")), n, m, key);
-            //string routeDecoded = RouteCipherDecode(routeEncoded);
+            string routeDecoded = RouteCipherDecode(routeEncoded, n, m, key);
             Console.WriteLine("Route cipher code:");
             Console.WriteLine("1. encoded - " + routeEncoded);
-            //Console.WriteLine("2. decoded - " + routeDecoded + '\n');
+            Console.WriteLine("2. decoded - " + routeDecoded + '\n');
         }
         
         //добавление символов в конец
@@ -227,10 +227,49 @@ namespace CryptographyTasks {
             return result.ToString(); //возвращаем результат
         }
         
-//        //дешифрование        
-//        public static string RouteCipherDecode() {
-//            
-//        }
+        //дешифрование        
+        public static string RouteCipherDecode(string text, int n, int m, string key) {
+            ArrayList entries = new ArrayList(); //здесь будут храниться блоки из n * m символов
+            
+            while (text.Length != 0) { //делим текст на блоки
+                entries.Add(text.Substring(0, n * m)); //иначе добавляем блок в массив
+                text = text.Remove(0, n * m); //и удаляем добавленные данные из строки
+            }
+            
+            ArrayList order = GetShowOrder(key);
+            StringBuilder result = new StringBuilder();
+
+            for (int i = 0; i < entries.Count; i++) { //для каждого блока
+                char[,] matrix = new char[n, m]; //создаём новую матрицу
+                entries[i] += key; //добавляем в конец блока ключ
+
+                for (int j = 0; j < m; j++) {
+                    for (int k = 0; k < n; k++) {
+                        //заполняем матрицу символами из текущего блока
+                        //j - индекс строки, k - индекс столбца. пусть n = 4, тогда
+                        //при j = 0 index = j + j * n + k принимает значения от 0 до 4 включительно
+                        //при j = 1 - от 5 до 9 и т.д.
+                        //таким образом index пройдёт все значения от 0 до m^2 невключительно, т.е. весь блок будет просмотрен
+                        matrix[k, j] = ((string) entries[i])[j + j * (n - 1) + k];
+                    }
+                }
+                
+                char[,] resultMatrix = new char[n, m];
+                for (int j = 0; j < m; j++) { 
+                    for (int k = 0; k < n; k++) {
+                        resultMatrix[k, (int) order[j]] = matrix[k, j];
+                    }
+                }
+
+                for (int j = 0; j < n; j++) {
+                    for (int k = 0; k < m; k++) {
+                        result.Append(resultMatrix[j, k]);
+                    }
+                }
+            }
+
+            return result.ToString();
+        }
 
         public static void Main(string[] args) {
 //            //#1
