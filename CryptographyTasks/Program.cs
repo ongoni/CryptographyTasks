@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace CryptographyTasks {
@@ -18,7 +20,7 @@ namespace CryptographyTasks {
             Console.WriteLine("File contol sum - " + GetFileMd5("../../lorem ipsum.txt") + '\n');
         }
         
-        public static string GetFileMd5(string path) {
+        private static string GetFileMd5(string path) {
             MD5 md5 = MD5.Create(); //создаём экземпляр класса md5
             StringBuilder result = new StringBuilder(); //сюда будем записывать результат
             FileStream fileStream = File.OpenRead(path); //создаём битовый файловый поток на основе файла
@@ -35,13 +37,13 @@ namespace CryptographyTasks {
         public static void Task2_1() {
             string atbashEncoded = GetAtbashCode(File.ReadAllText("../../lorem ipsum.txt"));
             string atbashDecoded = GetAtbashCode(atbashEncoded);
-            Console.WriteLine("Atbash code:");
+            Console.WriteLine("Atbash cipher code:");
             Console.WriteLine("1. encoded - " + atbashEncoded);
             Console.WriteLine("2. decoded - " + atbashDecoded + '\n');
         }
         
         //шифрование/дешифрование производится одной фукнцией
-        public static string GetAtbashCode(string text) {   
+        private static string GetAtbashCode(string text) {   
             StringBuilder result = new StringBuilder(); //сюда будем записывать результат
             
             for (int i = 0; i < text.Length; i++) { //для каждого символа из текста
@@ -62,7 +64,7 @@ namespace CryptographyTasks {
         public static void Task2_2() {
             string caesarEncoded = CaesarCipherEncode(File.ReadAllText("../../lorem ipsum.txt"));
             string caesarDecoded = CaesarCipherDecode(caesarEncoded);
-            Console.WriteLine("Caesar code:");
+            Console.WriteLine("Caesar cipher code:");
             Console.WriteLine("1. encoded - " + caesarEncoded);
             Console.WriteLine("2. decoded - " + caesarDecoded + '\n');
         }
@@ -70,7 +72,7 @@ namespace CryptographyTasks {
         //шифрование
         //индекс замены вычисляется как остаток от деления на длину алфавита, т.е. если исходная буква - 'z'
         //являющаяся 26-ой в алфавите, то её замена будет на позиции (26 + 3) % 26 = 3 - т.е. её замена - буква 'c'
-        public static string CaesarCipherEncode(string text) {
+        private static string CaesarCipherEncode(string text) {
             StringBuilder result = new StringBuilder();
 
             for (int i = 0; i < text.Length; i++) { //для каждого символа из текста
@@ -91,7 +93,7 @@ namespace CryptographyTasks {
         //дешифрование
         //пусть нужно дешифровать букву 'a', которая ялвяется первой в алфавите, тогда 
         //её замена будет на позиции (26 + 1 - 3) % 26 = 24 - т.е её замена - бувка 'x'
-        public static string CaesarCipherDecode(string encodedText) {
+        private static string CaesarCipherDecode(string encodedText) {
             StringBuilder result = new StringBuilder();
 
             for (int i = 0; i < encodedText.Length; i++) { //для каждого символа из текста
@@ -133,14 +135,81 @@ namespace CryptographyTasks {
                 }
                 break;
             }
+
+            string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText("../../lorem ipsum.txt")), n, m, key);
+            //string routeDecoded = RouteCipherDecode(routeEncoded);
+            Console.WriteLine("Route cipher code:");
+            Console.WriteLine("1. encoded - " + routeEncoded);
+            //Console.WriteLine("2. decoded - " + routeDecoded + '\n');
+        }
+
+        private static string AppendSymbols(string row, int length) {
+            StringBuilder result = new StringBuilder(row);
+            while (result.Length != length) {
+                result.Append('x');
+            }
+
+            return result.ToString();
+        }
+
+        private static string RemoveSymbols(string text) {
+            StringBuilder result = new StringBuilder(text);
+            for (int i = 0; i < result.Length; i++) {
+                if (!Char.IsLetter(result[i]) || result[i] == ' ') {
+                    result.Remove(i, 1);
+                    i--;
+                }
+            }
+
+            return result.ToString();
+        }
+
+        private static ArrayList GetShowOrder(string key) {
+            ArrayList result = new ArrayList();
+            string sorted = String.Concat(key.OrderBy(c => c));
+
+            for (int i = 0; i < key.Length; i++) {
+                result.Add(key.IndexOf(sorted[i]));
+            }
             
-            
+            return result;
         }
         
-//        //шифрование
-//        public static string RouteCipherEncode() {
-//            
-//        }
+        //шифрование
+        public static string RouteCipherEncode(string text, int n, int m, string key) {     
+            ArrayList entries = new ArrayList();
+            
+            while (text.Length != 0) {
+                if (text.Length < n * m) {
+                    entries.Add(AppendSymbols(text, n * m));
+                    break;
+                }
+                entries.Add(text.Substring(0, n * m));
+                text = text.Remove(0, n * m);
+            }
+
+            ArrayList order = GetShowOrder(key);
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < entries.Count; i++) {
+                char[,] matrix = new char[n + 1, m];
+                entries[i] += key;
+
+                for (int j = 0; j < n + 1; j++) {
+                    for (int k = 0; k < m; k++) {
+                        int index = j + j * n + k;
+                        matrix[j, k] = ((string) entries[i])[index];
+                    }
+                }
+
+                foreach (int index in order) {
+                    for (int j = 0; j < n; j++) {
+                        result.Append(matrix[j, index]);
+                    }
+                }
+            }
+
+            return result.ToString();
+        }
         
 //        //дешифрование        
 //        public static string RouteCipherDecode() {
@@ -148,12 +217,12 @@ namespace CryptographyTasks {
 //        }
 
         public static void Main(string[] args) {
-            //#1
-            Task1();
-            //#2.1
-            Task2_1();
-            //#2.2
-            Task2_2();
+//            //#1
+//            Task1();
+//            //#2.1
+//            Task2_1();
+//            //#2.2
+//            Task2_2();
             //#3
             Task3();
             //#4
