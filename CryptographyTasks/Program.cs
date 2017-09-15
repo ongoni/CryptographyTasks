@@ -17,8 +17,9 @@ namespace CryptographyTasks {
 
     class Program {
 
-        private static readonly string LoremImpsumPath = "../../lorem ipsum.txt"; //путь к файлу с обычными текстом
-        private static readonly string LoremImpsumLongPath = "../../lorem ipsum (long).txt"; //путь к файлу с длинным текстом
+        private static readonly string LoremIpsumPath = "../../lorem ipsum.txt"; //путь к файлу с обычными текстом
+        private static readonly string LoremIpsumLongPath = "../../lorem ipsum (long).txt"; //путь к файлу с большим числом строк
+        private static readonly string LoremIpsumClassicPath = "../../lorem ipsum (classic).txt"; //путь к файлу с большим количеством обычноготекста
         private static readonly List<char> Alphabet = new List<char> { //латинский алфавит
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
@@ -26,7 +27,7 @@ namespace CryptographyTasks {
         
         //первое задание - вычисление контрольной суммы файла
         public static void Task1() {
-            Console.WriteLine("File contol sum - " + GetFileMd5(LoremImpsumPath) + '\n'); //вывод контрольной суммы
+            Console.WriteLine("File contol sum - " + GetFileMd5(LoremIpsumPath) + '\n'); //вывод контрольной суммы
         }
         
         private static string GetFileMd5(string path) {
@@ -44,7 +45,7 @@ namespace CryptographyTasks {
 
         //второе задание, часть 1 - шифр "атбаш"
         public static void Task2_1() {
-            string atbashEncoded = GetAtbashCode(File.ReadAllText(LoremImpsumPath));
+            string atbashEncoded = GetAtbashCode(File.ReadAllText(LoremIpsumPath));
             string atbashDecoded = GetAtbashCode(atbashEncoded);
             Console.WriteLine("Atbash cipher code:");
             Console.WriteLine("1. encoded - " + atbashEncoded); //вывод закодированных данных
@@ -71,7 +72,7 @@ namespace CryptographyTasks {
 
         //второе задание, часть 2 - шифр Цезаря
         public static void Task2_2() {
-            string caesarEncoded = CaesarCipherEncode(File.ReadAllText(LoremImpsumPath));
+            string caesarEncoded = CaesarCipherEncode(File.ReadAllText(LoremIpsumPath));
             string caesarDecoded = CaesarCipherDecode(caesarEncoded);
             Console.WriteLine("Caesar cipher code:");
             Console.WriteLine("1. encoded - " + caesarEncoded); //вывод закодированных данных
@@ -122,6 +123,8 @@ namespace CryptographyTasks {
         
         //третье задание - маршрутное шифрование
         public static void Task3() {
+            Console.WriteLine("Route cipher code:");
+            
             int n, m;
             string key;
             while (true) { //требуем ввести данные, пока они не будут корректны
@@ -146,9 +149,8 @@ namespace CryptographyTasks {
             }
 
             //удаляем лишние символы и вызываем функцию шифрования
-            string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText(LoremImpsumPath)), n, m, key);
+            string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText(LoremIpsumPath)), n, m, key);
             string routeDecoded = RouteCipherDecode(routeEncoded, n, m, key);
-            Console.WriteLine("Route cipher code:");
             Console.WriteLine("1. encoded - " + routeEncoded);
             Console.WriteLine("2. decoded - " + routeDecoded + '\n');
         }
@@ -287,18 +289,18 @@ namespace CryptographyTasks {
 
         //четвёртное задание
         public static void Task4() {
+            Console.WriteLine("Task 4 Bit cipher code:");
             Console.Write("Enter phrase to encode: ");
             string data = Console.ReadLine();
             
-            Console.WriteLine("Bit cipher code:");
             //вызываем функцию шифрования, сразу отправляя туда биты из двоичного представления данных, которые нужно зашифровать
-            BitCipherEncode(LoremImpsumLongPath, GetBits(data)); 
-            string bitCipherDecoded = BitCipherDecode(LoremImpsumLongPath);
+            BitCipherEncode(LoremIpsumLongPath, GetBits(data)); 
+            string bitCipherDecoded = BitCipherDecode(LoremIpsumLongPath);
             Console.WriteLine("Decoded phrase - " + bitCipherDecoded + '\n');
         }
         
         //шифрование
-        //после шифрования дааные в файле переписываются вместе с зашифрованными данными
+        //после шифрования данные в файле переписываются вместе с зашифрованными данными
         public static void BitCipherEncode(string path, string data) {
             StringBuilder result = new StringBuilder(); //здесь будет результат
             //из входного файла считываем весь текст, разделив его на части по переводу строки, т.е. текст
@@ -388,18 +390,108 @@ namespace CryptographyTasks {
             return Encoding.UTF8.GetString(bytes.ToArray()); 
         }
         
+        //пятое задание
+        public static void Task5() {
+            Console.WriteLine("Task 5 Bit cipher code:");
+            Console.Write("Enter text to encode: ");
+            string data = Console.ReadLine();
+            
+            //вызываем функцию шифрования, сразу отправляя туда биты из двоичного представления данных, которые нужно зашифровать
+            BitCipherEncode2(LoremIpsumClassicPath, GetBits(data)); 
+            string bitCipherDecoded = BitCipherDecode2(LoremIpsumClassicPath);
+            Console.WriteLine("Decoded phrase - " + bitCipherDecoded + '\n');
+        }
+        
+        //шифрование
+        //после шифрования данные в файле перезаписываются вместе с зашифрованными данными
+        public static void BitCipherEncode2(string path, string data) {
+            //используя считанные из файла данные, заполняем StringBuilder, т.к. нам нужно будет производить
+            //много вставок символов (пробелов) в текст для шифровки введённых данных
+            StringBuilder text = new StringBuilder(File.ReadAllText(path));
+
+            //предварительно форматируем текст, удаляя лишние пробелы, чтобы они не мешали шифрованию и дешифрованию
+            for (int i = 0; i < text.Length; i++) { 
+                if (text[i] == ' ' && text[i + 1] == ' ') { //если текущий и следующий символы являются пробелами
+                    //то удаляем i-ый пробел и уменьшаем счётчик на 1, чтобы не пропустить ещё один возможный лишний пробел
+                    text.Remove(i, 1);
+                    i--;
+                }
+            }
+            
+            //проверяем, достаточно ли пробелов в тексте для шифровки введённых данных
+            if (GetSpacesCount(text) < data.Length * 8) {
+                Console.WriteLine("Text doesn't contain enough spaces."); //если нет, то выводим сообщение об этом
+                return; //и выходим из функции, не выполняя остальной код
+            }
+
+            int k = 0; //счётчик для прохода по битам из data
+            for (int i = 0; k < data.Length; i++) { //пока все биты шифруемых данных не просмотрены
+                //если текущий символ в тексте является пробелом
+                if (text[i] == ' ') {
+                    if (data[k] == '1') { //если текущий бит равен единице
+                        //то добавляем ещё один пробел и дополнительно увеличивем i, чтобы не рассматривать добавленный нами пробел
+                        text.Insert(i, " ");
+                        i++;
+                        k++;
+                    } else { //иначе бит равен 0 и пробел добавлять не нужно, переходим к следующему биту
+                        k++;
+                    }
+                }
+            }
+
+            File.WriteAllText(path, text.ToString()); //заполняем файл по указанном пути path полученными данными result
+
+            Console.WriteLine("Secret phrase encoded to file " + path); //выводим сообщение о том, что данные зашифрованы
+        }
+
+        //дешифрование
+        //после дешифрования файл с зашифрованными данными не изменяется, сами зашифрованные данные возвращаются в виде строки типа string
+        public static string BitCipherDecode2(string path) {
+            StringBuilder bits = new StringBuilder(); //здесь будут биты полученные из текста с зашифрованными данными
+            string text = File.ReadAllText(path); //считываем весь текст
+
+            for (int i = 0; i + 1 < text.Length; i++) { //просматриваем текст из файла
+                if (text[i] == ' ') { //если текущий символ является пробелом
+                    if (text[i + 1] == ' ') { //и следующий тоже является пробелом
+                        //то в список битов добавляем единицу и уделичиваем счётчик на 1, чтобы не рассматривать второй пробел
+                        //иначе данные будут дешифрованы неправильно, т.к. при рассмотрении второго пробела появится лишний нуль
+                        bits.Append('1');
+                        i++;
+                    } else { //иначе пробел только один, в список битов добавляем нуль
+                        bits.Append('0');
+                    }
+                }
+            }
+
+            //вызываем функцию преобразования битов в строку и возвращаем полученный из неё результат как результат дешифрования
+            return GetStringFromBits(bits.ToString()); 
+        }
+        
+        //получение количества пробелом в тексте
+        private static int GetSpacesCount(StringBuilder text) {
+            int count = 0; //счётчик пробелом
+            for (int i = 0; i < text.Length; i++) { 
+                if (text[i] == ' ') { //если текущий символ является пробелом, то увеличиваем счётчик на 1
+                    count++;
+                }
+            }
+
+            return count; //возвращаем число пробелом
+        }
+        
         public static void Main(string[] args) {
-//            //#1
-//            Task1();
-//            //#2.1
-//            Task2_1();
-//            //#2.2
-//            Task2_2();
-//            //#3
-//            Task3();
-//            //#4
+            //#1
+            Task1();
+            //#2.1
+            Task2_1();
+            //#2.2
+            Task2_2();
+            //#3
+            Task3();
+            //#4
             Task4();
             //#5
+            Task5();
         }
 
     }

@@ -45,6 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="lorem ipsum (classic).txt" />
     <Content Include="lorem ipsum (long).txt" />
     <Content Include="lorem ipsum.txt" />
   </ItemGroup>
