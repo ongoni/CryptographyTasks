@@ -23,11 +23,11 @@ namespace CryptographyTasks {
         private static readonly List<char> Alphabet = new List<char> { //латинский алфавит
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-        }; //латинский алфавит
+        };
         
         //первое задание - вычисление контрольной суммы файла
         public static void Task1() {
-            Console.WriteLine("File contol sum - " + GetFileMd5(LoremIpsumPath) + '\n'); //вывод контрольной суммы
+            Console.WriteLine("File contol sum - " + GetFileMd5(LoremIpsumPath) + '\n'); //вывод контрольной суммы md5
         }
         
         private static string GetFileMd5(string path) {
@@ -45,8 +45,9 @@ namespace CryptographyTasks {
 
         //второе задание, часть 1 - шифр "атбаш"
         public static void Task2_1() {
-            string atbashEncoded = GetAtbashCode(File.ReadAllText(LoremIpsumPath));
-            string atbashDecoded = GetAtbashCode(atbashEncoded);
+            //считываем весь текст из указанного файла и отправляем его в функцию для шифрования
+            string atbashEncoded = GetAtbashCode(File.ReadAllText(LoremIpsumPath)); 
+            string atbashDecoded = GetAtbashCode(atbashEncoded); //декодируем данные обратно
             Console.WriteLine("Atbash cipher code:");
             Console.WriteLine("1. encoded - " + atbashEncoded); //вывод закодированных данных
             Console.WriteLine("2. decoded - " + atbashDecoded + '\n'); //вывод декодированных данных
@@ -72,8 +73,9 @@ namespace CryptographyTasks {
 
         //второе задание, часть 2 - шифр Цезаря
         public static void Task2_2() {
+            //считываем весь текст из указанного файла и отправляем его в функцию для шифрования
             string caesarEncoded = CaesarCipherEncode(File.ReadAllText(LoremIpsumPath));
-            string caesarDecoded = CaesarCipherDecode(caesarEncoded);
+            string caesarDecoded = CaesarCipherDecode(caesarEncoded); //декодируем данные обратно
             Console.WriteLine("Caesar cipher code:");
             Console.WriteLine("1. encoded - " + caesarEncoded); //вывод закодированных данных
             Console.WriteLine("2. decoded - " + caesarDecoded + '\n'); //вывод декодированных данных
@@ -125,8 +127,8 @@ namespace CryptographyTasks {
         public static void Task3() {
             Console.WriteLine("Route cipher code:");
             
-            int n, m;
-            string key;
+            int n, m; //размерность матрицы, n * m - размер текстового блока
+            string key; //слово-ключ (пароль)
             while (true) { //требуем ввести данные, пока они не будут корректны
                 Console.Write("Enter n: ");
                 n = int.Parse(Console.ReadLine()); 
@@ -138,7 +140,7 @@ namespace CryptographyTasks {
                     continue; //возвращаемся к вводу n и m
                 }
                 
-                Console.Write("Enter key word (" + m + " symbols): "); 
+                Console.Write("Enter key word (" + m + " symbols): ");
                 key = Console.ReadLine();
 
                 if (key.Length != m) { //ключ должен быть длины m
@@ -148,9 +150,10 @@ namespace CryptographyTasks {
                 break; //если всё корректно введено, то здесь цикл прервётся
             }
 
-            //удаляем лишние символы и вызываем функцию шифрования
-            string routeEncoded = RouteCipherEncode(RemoveSymbols(File.ReadAllText(LoremIpsumPath)), n, m, key);
-            string routeDecoded = RouteCipherDecode(routeEncoded, n, m, key);
+            //считываем текст, удаляем из него лишние символы (всё, кроме букв)
+            string text = RemoveSymbols(File.ReadAllText(LoremIpsumPath));
+            string routeEncoded = RouteCipherEncode(text, n, m, key); //вызываем функцию шифрования, передавая текст, размерность и ключ
+            string routeDecoded = RouteCipherDecode(routeEncoded, n, m, key); //вызываем функцию дешифрования
             Console.WriteLine("1. encoded - " + routeEncoded);
             Console.WriteLine("2. decoded - " + routeDecoded + '\n');
         }
